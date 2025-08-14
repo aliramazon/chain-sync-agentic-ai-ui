@@ -3,6 +3,7 @@ import { FiLayers, FiLink, FiMessageCircle } from "react-icons/fi";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./components/sidebar/Sidebar";
 import type { SidebarNavItemProps } from "./components/sidebar/SidebarNavItem";
+import { Toaster } from "./components/toaster/Toaster";
 
 export const App = () => {
     const sidebarItems: SidebarNavItemProps[] = [
@@ -24,12 +25,15 @@ export const App = () => {
     ];
 
     return (
-        <Flex h="100vh" bg={["gray.50", null, "gray.100"]}>
-            <Sidebar items={sidebarItems} />
+        <>
+            <Flex h="100vh" bg={["gray.50", null, "gray.100"]}>
+                <Sidebar items={sidebarItems} />
 
-            <Box as="main" flex="1" p={{ base: 4, md: 6 }} overflowY="auto">
-                <Outlet />
-            </Box>
-        </Flex>
+                <Box as="main" flex="1" p={{ base: 4, md: 6 }} overflowY="auto">
+                    <Outlet />
+                </Box>
+            </Flex>
+            <Toaster />
+        </>
     );
 };
