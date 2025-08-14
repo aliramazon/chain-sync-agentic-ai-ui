@@ -1,36 +1,35 @@
-import styled from "@emotion/styled";
-import { Link, Outlet } from "react-router-dom";
-
-const AppLayout = styled.main`
-    display: flex;
-`;
+import { Box, Flex } from "@chakra-ui/react";
+import { FiLayers, FiLink, FiMessageCircle } from "react-icons/fi";
+import { Outlet } from "react-router-dom";
+import { Sidebar } from "./components/sidebar/Sidebar";
+import type { SidebarNavItemProps } from "./components/sidebar/SidebarNavItem";
 
 export const App = () => {
-    return (
-        <AppLayout>
-            <nav
-                style={{
-                    width: "200px",
-                    background: "#f4f4f4",
-                    padding: "1rem",
-                }}
-            >
-                <ul style={{ listStyle: "none", padding: 0 }}>
-                    <li>
-                        <Link to="/workflows">Workflows</Link>
-                    </li>
-                    <li>
-                        <Link to="/connections">Connections</Link>
-                    </li>
-                    <li>
-                        <Link to="/chat">Chat</Link>
-                    </li>
-                </ul>
-            </nav>
+    const sidebarItems: SidebarNavItemProps[] = [
+        {
+            to: "/workflows",
+            icon: FiLayers,
+            label: "Workflows",
+        },
+        {
+            to: "/connections",
+            icon: FiLink,
+            label: "Connections",
+        },
+        {
+            to: "/chat",
+            icon: FiMessageCircle,
+            label: "Chat",
+        },
+    ];
 
-            <div style={{ flex: 1, padding: "1rem" }}>
+    return (
+        <Flex h="100vh" bg={["gray.50", null, "gray.100"]}>
+            <Sidebar items={sidebarItems} />
+
+            <Box as="main" flex="1" p={{ base: 4, md: 6 }} overflowY="auto">
                 <Outlet />
-            </div>
-        </AppLayout>
+            </Box>
+        </Flex>
     );
 };
