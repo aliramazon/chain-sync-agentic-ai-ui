@@ -10,7 +10,7 @@ export const Sidebar = ({ items }: SidebarProps) => {
     return (
         <Box
             as="aside"
-            w={{ base: "76px", md: "280px" }}
+            w="280px"
             bg="white"
             borderRight="1px solid"
             borderColor="gray.200"
