@@ -156,18 +156,15 @@ export const Connections = () => {
                 <Grid
                     templateColumns={{
                         base: "1fr",
-                        sm: "repeat(2, 1fr)",
-                        md: "repeat(3, 1fr)",
-                        lg: "repeat(4, 1fr)",
+                        sm: "repeat(1, 1fr)",
+                        md: "repeat(2, 1fr)",
+                        lg: "repeat(3, 1fr)",
                     }}
                     gap={6}
                 >
                     {connectors.map((connector) => {
                         return (
-                            <Card.Root
-                                key={connector.id || connector.name}
-                                maxWidth="320px"
-                            >
+                            <Card.Root key={connector.id || connector.name}>
                                 <Card.Body gap={3}>
                                     <Card.Title
                                         mt="2"
