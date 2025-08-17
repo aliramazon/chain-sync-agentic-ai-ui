@@ -1,8 +1,9 @@
 import type { Connector } from "../../types";
+import { config } from "../config";
 
 export async function getConnectors(): Promise<Connector[]> {
     try {
-        const res = await fetch(`http://localhost:3000/api/connectors`, {
+        const res = await fetch(`${config.apiBaseUrl}/connectors`, {
             method: "GET",
         });
 

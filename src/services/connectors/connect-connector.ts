@@ -1,9 +1,10 @@
 import type { Connector } from "../../types";
+import { config } from "../config";
 
 export async function connectConnector(id: string): Promise<Connector> {
     try {
         const res = await fetch(
-            `http://localhost:3000/api/connectors/${id}/connect`,
+            `${config.apiBaseUrl}/connectors/${id}/connect`,
             {
                 method: "POST",
             }

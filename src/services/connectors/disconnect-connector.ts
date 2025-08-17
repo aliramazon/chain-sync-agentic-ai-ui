@@ -1,9 +1,10 @@
 import type { Connector } from "../../types";
+import { config } from "../config";
 
 export async function disconnectConnector(id: string): Promise<Connector> {
     try {
         const res = await fetch(
-            `http://localhost:3000/api/connectors/${id}/disconnect`,
+            `${config.apiBaseUrl}/connectors/${id}/disconnect`,
             {
                 method: "POST",
             }
