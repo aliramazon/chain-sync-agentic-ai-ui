@@ -6,7 +6,7 @@ import {
 import { App } from "../App";
 import { Chat } from "../pages/chat/Chat";
 import { Connections } from "../pages/connections/Connections";
-import { Workflow } from "../pages/workflows/Workflow";
+import { Workflow } from "../pages/workflow/Workflow";
 import { Workflows } from "../pages/workflows/Workflows";
 
 export const router = createBrowserRouter(
