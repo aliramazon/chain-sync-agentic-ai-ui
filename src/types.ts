@@ -8,12 +8,77 @@ export type ConnectorStatus =
     (typeof ConnectorStatus)[keyof typeof ConnectorStatus];
 
 export interface Connector {
-    name: string;
     id: string;
+    name: string;
     key: string;
-    createdAt: Date;
     status: ConnectorStatus;
     lastError: string | null;
     connectedAt: Date | null;
     disconnectedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date; // Added missing field
+}
+
+export const ActionType = {
+    TRIGGER: "trigger",
+    ACTION: "action",
+} as const;
+
+export type ActionType = (typeof ActionType)[keyof typeof ActionType];
+
+export interface ActionCatalog {
+    id: string;
+    connectorId: string;
+    type: ActionType;
+    key: string;
+    title: string;
+    description: string;
+    schemaInput?: unknown;
+    schemaOutput?: unknown;
+    examples?: unknown;
+    createdAt: Date;
+    updatedAt: Date;
+
+    // Related data (when included)
+    connector?: Connector;
+}
+
+export interface WorkflowStepConfiguration {
+    dependencies?: string[];
+    position?: {
+        x: number;
+        y: number;
+    };
+    description?: string;
+    [key: string]: unknown; // For future extensibility
+}
+
+export interface WorkflowStep {
+    id: string;
+    workflowId: string;
+    actionId: string;
+    connectorId: string;
+    stepOrder: number;
+    externalId: string;
+    configuration: WorkflowStepConfiguration;
+    createdAt: string;
+    updatedAt: string;
+
+    // Related data (when included)
+    action?: ActionCatalog;
+    connector?: Connector;
+    workflow?: Workflow;
+}
+
+export interface Workflow {
+    id: string;
+    name: string;
+    description?: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    _count: {
+        steps: number;
+    };
+    steps?: WorkflowStep[];
 }
