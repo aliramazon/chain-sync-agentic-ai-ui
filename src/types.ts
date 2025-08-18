@@ -43,16 +43,6 @@ export interface ActionCatalog {
     connector?: Connector;
 }
 
-export interface WorkflowStepConfiguration {
-    dependencies?: string[];
-    position?: {
-        x: number;
-        y: number;
-    };
-    description?: string;
-    [key: string]: unknown; // For future extensibility
-}
-
 export interface WorkflowStep {
     id: string;
     workflowId: string;
@@ -60,11 +50,11 @@ export interface WorkflowStep {
     connectorId: string;
     stepOrder: number;
     externalId: string;
-    configuration: WorkflowStepConfiguration;
     createdAt: string;
     updatedAt: string;
+    dependsOn: string[];
+    description: string;
 
-    // Related data (when included)
     action?: ActionCatalog;
     connector?: Connector;
     workflow?: Workflow;
