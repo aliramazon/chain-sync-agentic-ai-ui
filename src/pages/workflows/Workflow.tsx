@@ -5,7 +5,6 @@ import {
     type Edge,
     Handle,
     MarkerType,
-    MiniMap,
     type Node,
     Position,
     ReactFlow,
@@ -301,11 +300,6 @@ export const Workflow = () => {
                 >
                     <Background gap={22} size={1} color="#e2e8f0" />
                     <Controls showInteractive={false} position="bottom-right" />
-                    <MiniMap
-                        nodeColor={() => "#3182ce"}
-                        maskColor="rgba(0,0,0,0.06)"
-                        position="top-right"
-                    />
                 </ReactFlow>
             </ReactFlowProvider>
         </Box>
