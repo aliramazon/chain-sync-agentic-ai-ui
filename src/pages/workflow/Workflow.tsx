@@ -1,4 +1,12 @@
-import { Box, Spinner, Text, VStack, useToken } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    Spinner,
+    Text,
+    VStack,
+    useToken,
+} from "@chakra-ui/react";
 import {
     Background,
     Controls,
@@ -12,8 +20,10 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toaster } from "../../components/toaster/Toaster";
+import { runWorkflowWithSyntheticData } from "../../services/workflows/run-workflow-with-synthetic-data";
 import { buildGraphFromWorkflow } from "./build-graph-from-workflow";
 import { useWorkflow } from "./use-workflow";
 import { WorkflowNode } from "./WorkflowNode";
@@ -22,7 +32,7 @@ export const Workflow = () => {
     const { id } = useParams<{ id: string }>();
     const { workflow, loading } = useWorkflow(id);
 
-    // pull Chakra colors
+    // theme colors
     const [blue500, gray200] = useToken("colors", ["blue.500", "gray.200"]);
 
     const initialGraph = useMemo(
@@ -36,10 +46,41 @@ export const Workflow = () => {
         initialGraph.edges
     );
 
+    const [isRunning, setIsRunning] = useState(false);
+
     useEffect(() => {
         setNodes(initialGraph.nodes);
         setEdges(initialGraph.edges);
     }, [initialGraph.nodes, initialGraph.edges, setNodes, setEdges]);
+
+    const handleRunWorkflow = async () => {
+        if (!workflow?.id || isRunning) return;
+
+        try {
+            setIsRunning(true);
+
+            const result = await runWorkflowWithSyntheticData(workflow.id);
+
+            toaster.success({
+                title: "Workflow executed",
+                description:
+                    result.message ?? "Workflow ran with synthetic data",
+
+                duration: 4000,
+            });
+        } catch (err) {
+            console.error(err);
+
+            toaster.error({
+                title: "Workflow failed",
+                description:
+                    err instanceof Error ? err.message : "Something went wrong",
+                duration: 4000,
+            });
+        } finally {
+            setIsRunning(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -74,32 +115,52 @@ export const Workflow = () => {
     }
 
     return (
-        <Box h="full" w="full">
-            <ReactFlowProvider>
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
-                    nodeTypes={{ custom: WorkflowNode }}
-                    fitViewOptions={{ padding: 0.2 }}
-                    nodesDraggable
-                    fitView
-                    defaultEdgeOptions={{
-                        type: "smoothstep",
-                        animated: true,
-                        markerEnd: {
-                            type: MarkerType.ArrowClosed,
-                            width: 20,
-                            height: 20,
-                        },
-                        style: { strokeWidth: 2, stroke: blue500 },
-                    }}
-                >
-                    <Background gap={22} size={1} color={gray200} />
-                    <Controls showInteractive={false} position="bottom-right" />
-                </ReactFlow>
-            </ReactFlowProvider>
+        <Box h="full" w="full" padding={4}>
+            <VStack h="full" w="full" align="stretch" gap={6}>
+                <Flex align="center" justify="flex-end">
+                    <Button
+                        onClick={handleRunWorkflow}
+                        loading={isRunning}
+                        loadingText="Running…"
+                        colorScheme="blue"
+                        size="sm"
+                        colorPalette="blue"
+                    >
+                        Run Workflow
+                    </Button>
+                </Flex>
+
+                <Box flex="1 1 auto" minH="0" h="full" w="full">
+                    <ReactFlowProvider>
+                        <ReactFlow
+                            nodes={nodes}
+                            edges={edges}
+                            onNodesChange={onNodesChange}
+                            onEdgesChange={onEdgesChange}
+                            nodeTypes={{ custom: WorkflowNode }}
+                            fitView
+                            fitViewOptions={{ padding: 0.2 }}
+                            nodesDraggable
+                            defaultEdgeOptions={{
+                                type: "smoothstep",
+                                animated: true,
+                                markerEnd: {
+                                    type: MarkerType.ArrowClosed,
+                                    width: 20,
+                                    height: 20,
+                                },
+                                style: { strokeWidth: 2, stroke: blue500 },
+                            }}
+                        >
+                            <Background gap={22} size={1} color={gray200} />
+                            <Controls
+                                showInteractive={false}
+                                position="bottom-right"
+                            />
+                        </ReactFlow>
+                    </ReactFlowProvider>
+                </Box>
+            </VStack>
         </Box>
     );
 };
