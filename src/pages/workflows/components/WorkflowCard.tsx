@@ -14,6 +14,7 @@ import { formatDate } from "../../../utils/format-date";
 
 interface WorkflowCardProps extends Workflow {
     changeStatus: (id: string, status: "activate" | "deactivate") => void;
+    deleteWorkflow: (id: string) => void;
 }
 
 export const WorkflowCard = ({
@@ -24,11 +25,11 @@ export const WorkflowCard = ({
     name,
     id,
     changeStatus,
+    deleteWorkflow,
 }: WorkflowCardProps) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Check if this workflow is the currently active route
     const isCurrentRoute = location.pathname === `/workflows/${id}`;
 
     const getStatusBadge = (isActive: boolean) => {
@@ -45,6 +46,7 @@ export const WorkflowCard = ({
 
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
+        deleteWorkflow(id);
     };
 
     const handleToggleActivation = (e: React.MouseEvent) => {
@@ -52,13 +54,11 @@ export const WorkflowCard = ({
         if (isActive) {
             changeStatus(id, "deactivate");
         } else {
-            console.log(`Activate workflow ${id}`);
             changeStatus(id, "activate");
         }
     };
 
     const handleMenuClick = (e: React.MouseEvent) => {
-        // Prevent card click when clicking menu
         e.stopPropagation();
     };
 

@@ -1,8 +1,9 @@
 import { Box, Flex, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { toaster } from "../../components/toaster/Toaster";
-import { changeWorkflowStatus } from "../../services/workflows/change-status";
+import { changeWorkflowStatus } from "../../services/workflows/change-workflow-status";
+import { deleteWorkflow as deleteWorkflowService } from "../../services/workflows/delete-workflow";
 import { getAllWorkflows } from "../../services/workflows/get-all-workflows";
 import type { Workflow } from "../../types";
 import { WorkflowCard } from "./components/WorkflowCard";
@@ -11,6 +12,7 @@ export const Workflows = () => {
     const [workflows, setWorkflows] = useState<Workflow[] | null>(null);
     const [fetchingWorkflows, setFetchingWorkflows] = useState(true);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const hasNestedRoute = location.pathname !== "/workflows";
 
@@ -74,6 +76,42 @@ export const Workflows = () => {
         }
     };
 
+    const deleteWorkflow = async (id: string) => {
+        try {
+            await deleteWorkflowService(id);
+
+            // Remove the workflow from local state
+            setWorkflows(
+                (prevWorkflows) =>
+                    prevWorkflows?.filter((workflow) => workflow.id !== id) ||
+                    null
+            );
+
+            toaster.create({
+                title: "Workflow Deleted",
+                description: "Workflow has been deleted successfully.",
+                type: "success",
+                duration: 3000,
+            });
+
+            // If currently viewing the deleted workflow, redirect to workflows list
+            if (location.pathname === `/workflows/${id}`) {
+                navigate("/workflows");
+            }
+        } catch (error) {
+            console.error("Failed to delete workflow:", error);
+            toaster.create({
+                title: "Failed to Delete Workflow",
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Could not delete workflow. Please try again.",
+                type: "error",
+                duration: 4000,
+            });
+        }
+    };
+
     return (
         <VStack align="stretch" gap={6}>
             <Heading size="lg">Workflows</Heading>
@@ -99,6 +137,7 @@ export const Workflows = () => {
                                     {...{
                                         ...workflow,
                                         changeStatus: changeStatus,
+                                        deleteWorkflow: deleteWorkflow,
                                     }}
                                     key={workflow.id}
                                 />
