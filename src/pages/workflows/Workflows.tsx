@@ -2,6 +2,7 @@ import { Box, Flex, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { toaster } from "../../components/toaster/Toaster";
+import { changeWorkflowStatus } from "../../services/workflows/change-status";
 import { getAllWorkflows } from "../../services/workflows/get-all-workflows";
 import type { Workflow } from "../../types";
 import { WorkflowCard } from "./components/WorkflowCard";
@@ -33,6 +34,46 @@ export const Workflows = () => {
             });
     }, []);
 
+    const changeStatus = async (
+        id: string,
+        status: "activate" | "deactivate"
+    ) => {
+        try {
+            const updatedWorkflow = await changeWorkflowStatus(id, status);
+
+            // Update the workflow in local state
+            setWorkflows(
+                (prevWorkflows) =>
+                    prevWorkflows?.map((workflow) =>
+                        workflow.id === id
+                            ? {
+                                  ...workflow,
+                                  isActive: updatedWorkflow.isActive,
+                              }
+                            : workflow
+                    ) || null
+            );
+
+            toaster.create({
+                title: "Workflow Updated",
+                description: `Workflow has been ${status}d successfully.`,
+                type: "success",
+                duration: 3000,
+            });
+        } catch (error) {
+            console.error("Failed to change workflow status:", error);
+            toaster.create({
+                title: "Failed to Update Workflow",
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Could not update workflow status. Please try again.",
+                type: "error",
+                duration: 4000,
+            });
+        }
+    };
+
     return (
         <VStack align="stretch" gap={6}>
             <Heading size="lg">Workflows</Heading>
@@ -54,7 +95,13 @@ export const Workflows = () => {
                             </VStack>
                         ) : workflows && workflows.length > 0 ? (
                             workflows.map((workflow) => (
-                                <WorkflowCard {...workflow} />
+                                <WorkflowCard
+                                    {...{
+                                        ...workflow,
+                                        changeStatus: changeStatus,
+                                    }}
+                                    key={workflow.id}
+                                />
                             ))
                         ) : (
                             <VStack gap={3} py={8}>

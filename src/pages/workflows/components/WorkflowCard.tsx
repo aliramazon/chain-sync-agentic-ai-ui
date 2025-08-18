@@ -12,6 +12,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { Workflow } from "../../../types";
 import { formatDate } from "../../../utils/format-date";
 
+interface WorkflowCardProps extends Workflow {
+    changeStatus: (id: string, status: "activate" | "deactivate") => void;
+}
+
 export const WorkflowCard = ({
     isActive,
     description,
@@ -19,7 +23,8 @@ export const WorkflowCard = ({
     createdAt,
     name,
     id,
-}: Workflow) => {
+    changeStatus,
+}: WorkflowCardProps) => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -38,21 +43,17 @@ export const WorkflowCard = ({
         navigate(`/workflows/${workflowId}`);
     };
 
-    // Placeholder functions
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
-        console.log(`Delete workflow ${id}`);
-        // TODO: Implement delete functionality
     };
 
     const handleToggleActivation = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (isActive) {
-            console.log(`Deactivate workflow ${id}`);
-            // TODO: Implement deactivation functionality
+            changeStatus(id, "deactivate");
         } else {
             console.log(`Activate workflow ${id}`);
-            // TODO: Implement activation functionality
+            changeStatus(id, "activate");
         }
     };
 
