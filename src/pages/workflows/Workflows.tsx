@@ -1,4 +1,12 @@
-import { Box, Flex, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    Heading,
+    Spinner,
+    Text,
+    VStack,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { toaster } from "../../components/toaster/Toaster";
@@ -6,11 +14,13 @@ import { changeWorkflowStatus } from "../../services/workflows/change-workflow-s
 import { deleteWorkflow as deleteWorkflowService } from "../../services/workflows/delete-workflow";
 import { getAllWorkflows } from "../../services/workflows/get-all-workflows";
 import type { Workflow } from "../../types";
+import { CreateWorkflowModal } from "./components/CreateWorkflowModal";
 import { WorkflowCard } from "./components/WorkflowCard";
 
 export const Workflows = () => {
     const [workflows, setWorkflows] = useState<Workflow[] | null>(null);
     const [fetchingWorkflows, setFetchingWorkflows] = useState(true);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -112,9 +122,40 @@ export const Workflows = () => {
         }
     };
 
+    const handleCreateWorkflow = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const handleWorkflowCreated = (workflow: Workflow) => {
+        // Add the new workflow to local state
+        setWorkflows((prevWorkflows) =>
+            prevWorkflows ? [workflow, ...prevWorkflows] : [workflow]
+        );
+
+        // Show success toast
+        toaster.create({
+            title: "Workflow Created",
+            description: `Workflow "${workflow.name}" has been created successfully.`,
+            type: "success",
+            duration: 3000,
+        });
+
+        // Navigate to the new workflow
+        navigate(`/workflows/${workflow.id}`);
+    };
+
+    const handleCloseModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
     return (
         <VStack align="stretch" gap={6}>
-            <Heading size="lg">Workflows</Heading>
+            <Flex justify="space-between" align="center">
+                <Heading size="lg">Workflows</Heading>
+                <Button colorPalette="blue" onClick={handleCreateWorkflow}>
+                    Create Workflow
+                </Button>
+            </Flex>
             <Flex h="calc(100vh - 120px)" gap={0}>
                 <Box
                     w="25rem"
@@ -178,6 +219,12 @@ export const Workflows = () => {
                     )}
                 </Box>
             </Flex>
+
+            <CreateWorkflowModal
+                isOpen={isCreateModalOpen}
+                onClose={handleCloseModal}
+                onWorkflowCreated={handleWorkflowCreated}
+            />
         </VStack>
     );
 };
