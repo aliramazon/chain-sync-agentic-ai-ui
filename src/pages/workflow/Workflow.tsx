@@ -2,8 +2,6 @@ import {
     Box,
     Button,
     Flex,
-    IconButton,
-    Input,
     Spinner,
     Text,
     VStack,
@@ -21,14 +19,15 @@ import {
     useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { IoSend } from "react-icons/io5";
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toaster } from "../../components/toaster/Toaster";
 import { runWorkflowWithSyntheticData } from "../../services/workflows/run-workflow-with-synthetic-data";
+
 import { buildGraphFromWorkflow } from "./build-graph-from-workflow";
 import { useWorkflow } from "./use-workflow";
+import { WorkflowChat } from "./WorkflowChat";
 import { WorkflowNode } from "./WorkflowNode";
 
 export const Workflow = () => {
@@ -50,7 +49,7 @@ export const Workflow = () => {
     );
 
     const [isRunning, setIsRunning] = useState(false);
-    const [inputValue, setInputValue] = useState("");
+    const [chatInputValue, setChatInputValue] = useState("");
 
     useEffect(() => {
         setNodes(initialGraph.nodes);
@@ -86,16 +85,13 @@ export const Workflow = () => {
         }
     };
 
-    const handleSendChange = () => {
-        console.log("Sending workflow change:", inputValue);
-        setInputValue("");
+    const onChatValueChange = (value: string) => {
+        setChatInputValue(value);
     };
 
-    const handleInputKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSendChange();
-        }
+    const sendUserIntent = () => {
+        console.log("Send: ", chatInputValue);
+        setChatInputValue("");
     };
 
     if (loading) {
@@ -171,7 +167,10 @@ export const Workflow = () => {
                                     width: 20,
                                     height: 20,
                                 },
-                                style: { strokeWidth: 2, stroke: blue500 },
+                                style: {
+                                    strokeWidth: 2,
+                                    stroke: blue500,
+                                },
                             }}
                         >
                             <Background gap={22} size={1} color={gray200} />
@@ -182,42 +181,11 @@ export const Workflow = () => {
                         </ReactFlow>
                     </ReactFlowProvider>
 
-                    <Box
-                        position="absolute"
-                        bottom="4"
-                        left="50%"
-                        transform="translateX(-50%)"
-                        zIndex={10}
-                        bg="white"
-                        borderRadius="md"
-                        boxShadow="lg"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        p="2"
-                        w="75%"
-                    >
-                        <Flex align="center" gap={2}>
-                            <Input
-                                placeholder="Describe changes to make to this workflow..."
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onKeyDown={handleInputKeyPress}
-                                size="sm"
-                                border="none"
-                                _focus={{ boxShadow: "none" }}
-                                flex="1"
-                            />
-                            <IconButton
-                                aria-label="Send workflow change"
-                                onClick={handleSendChange}
-                                size="sm"
-                                colorPalette="blue"
-                                disabled={!inputValue.trim()}
-                            >
-                                <IoSend />
-                            </IconButton>
-                        </Flex>
-                    </Box>
+                    <WorkflowChat
+                        onChange={onChatValueChange}
+                        value={chatInputValue}
+                        onSend={sendUserIntent}
+                    />
                 </Box>
             </VStack>
         </Box>
