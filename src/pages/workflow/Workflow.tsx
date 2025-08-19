@@ -2,6 +2,8 @@ import {
     Box,
     Button,
     Flex,
+    IconButton,
+    Input,
     Spinner,
     Text,
     VStack,
@@ -19,6 +21,7 @@ import {
     useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { IoSend } from "react-icons/io5";
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -47,6 +50,7 @@ export const Workflow = () => {
     );
 
     const [isRunning, setIsRunning] = useState(false);
+    const [inputValue, setInputValue] = useState("");
 
     useEffect(() => {
         setNodes(initialGraph.nodes);
@@ -79,6 +83,18 @@ export const Workflow = () => {
             });
         } finally {
             setIsRunning(false);
+        }
+    };
+
+    const handleSendChange = () => {
+        console.log("Sending workflow change:", inputValue);
+        setInputValue("");
+    };
+
+    const handleInputKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSendChange();
         }
     };
 
@@ -130,7 +146,13 @@ export const Workflow = () => {
                     </Button>
                 </Flex>
 
-                <Box flex="1 1 auto" minH="0" h="full" w="full">
+                <Box
+                    flex="1 1 auto"
+                    minH="0"
+                    h="full"
+                    w="full"
+                    position="relative"
+                >
                     <ReactFlowProvider>
                         <ReactFlow
                             nodes={nodes}
@@ -159,6 +181,43 @@ export const Workflow = () => {
                             />
                         </ReactFlow>
                     </ReactFlowProvider>
+
+                    <Box
+                        position="absolute"
+                        bottom="4"
+                        left="50%"
+                        transform="translateX(-50%)"
+                        zIndex={10}
+                        bg="white"
+                        borderRadius="md"
+                        boxShadow="lg"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        p="2"
+                        w="75%"
+                    >
+                        <Flex align="center" gap={2}>
+                            <Input
+                                placeholder="Describe changes to make to this workflow..."
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                onKeyDown={handleInputKeyPress}
+                                size="sm"
+                                border="none"
+                                _focus={{ boxShadow: "none" }}
+                                flex="1"
+                            />
+                            <IconButton
+                                aria-label="Send workflow change"
+                                onClick={handleSendChange}
+                                size="sm"
+                                colorPalette="blue"
+                                disabled={!inputValue.trim()}
+                            >
+                                <IoSend />
+                            </IconButton>
+                        </Flex>
+                    </Box>
                 </Box>
             </VStack>
         </Box>
